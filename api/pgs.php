@@ -24,16 +24,23 @@ try {
     };
 
     if ($method === 'GET') {
-        // Get PGs; filter duty with ?duty=1 to get current duty PG(s)
+        // Get PGs; filter duty with ?duty=1 to get current duty PG(s), and optionally filter by doctor_id
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         $duty = isset($_GET['duty']) ? (int)$_GET['duty'] : null;
+        $doctorId = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : null;
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
 
-        $where = ["role = 'pg'"]; $params = [];
-        if ($search !== '') { $where[] = '(name LIKE :q OR email LIKE :q)'; $params['q'] = "%$search%"; }
-        if ($duty !== null) { $where[] = 'is_duty = :is_duty'; $params['is_duty'] = $duty ? 1 : 0; }
-        $sql = 'SELECT id, name, email, role, is_duty, created_at FROM users WHERE '.implode(' AND ', $where).' ORDER BY name ASC LIMIT :limit OFFSET :offset';
+        $where = ["u.role = 'pg'"]; $params = [];
+        if ($search !== '') { $where[] = '(u.name LIKE :q OR u.email LIKE :q)'; $params['q'] = "%$search%"; }
+        if ($duty !== null) { $where[] = 'u.is_duty = :is_duty'; $params['is_duty'] = $duty ? 1 : 0; }
+        if ($doctorId !== null) { $where[] = 'dp.d_id = :did'; $params['did'] = $doctorId; }
+        $sql = 'SELECT u.id, u.name, u.email, u.role, u.is_duty, u.created_at, dp.d_id as doctor_id 
+                FROM users u 
+                LEFT JOIN doctor_pg dp ON u.id = dp.pg_id 
+                WHERE '.implode(' AND ', $where).' 
+                ORDER BY u.name ASC 
+                LIMIT :limit OFFSET :offset';
         $st = $pdo->prepare($sql);
         foreach ($params as $k=>$v) { $st->bindValue(":$k", $v); }
         $st->bindValue(':limit', $limit, PDO::PARAM_INT);

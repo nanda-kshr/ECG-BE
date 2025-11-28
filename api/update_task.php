@@ -74,7 +74,7 @@ try {
         exit;
     }
 
-    $canProvideFeedback = $isAdmin || $isAssignedDoctor;
+    $canProvideFeedback = $isAdmin || $isAssignedDoctor || $isAssignedPg;
 
     $pdo->beginTransaction();
 
@@ -101,7 +101,7 @@ try {
     if ($feedback !== '') {
         if (!$canProvideFeedback) {
             http_response_code(403);
-            echo json_encode(['success'=>false,'error'=>'Only assigned doctor can provide feedback']);
+            echo json_encode(['success'=>false,'error'=>'Only assigned doctor or PG can provide feedback']);
             exit;
         }
         $patientId = (int)$task['patient_id'];
@@ -111,12 +111,15 @@ try {
         if (!$stmtCheck->fetch()) {
             throw new RuntimeException('Image not found for this patient');
         }
-        // Update the image
-        $uimg = $pdo->prepare("UPDATE ecg_images SET comment = :cmt, status = 'completed' WHERE id = :img");
+        // Update the image comment (allow update even if already completed)
+        $uimg = $pdo->prepare("UPDATE ecg_images SET comment = :cmt WHERE id = :img");
         $uimg->execute(['cmt' => $feedback, 'img' => $imageId]);
         if ($uimg->rowCount() === 0) {
             throw new RuntimeException('Failed to update image');
         }
+        
+        // Mark as completed if not already
+        $pdo->prepare("UPDATE ecg_images SET status = 'completed' WHERE id = :img AND status != 'completed'")->execute(['img' => $imageId]);
 
         // Check if last 10 images for this task are all commented and completed
         $chk = $pdo->prepare("SELECT status, comment FROM ecg_images WHERE task_id = :tid ORDER BY created_at DESC, id DESC LIMIT 10");

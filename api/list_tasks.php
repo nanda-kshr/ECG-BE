@@ -15,10 +15,11 @@ try {
     require_once __DIR__ . '/db.php';
 
     // Query params
-    // Task-level status is removed in the schema; keep filters for doctor/technician only
+    // Task-level status is removed in the schema; keep filters for doctor/technician/pg only
     $status = null;
     $doctorId = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : null;
     $technicianId = isset($_GET['technician_id']) ? (int)$_GET['technician_id'] : null;
+    $pgId = isset($_GET['pg_id']) ? (int)$_GET['pg_id'] : null;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
     // If provided, return all tasks for the last N distinct patients matching filters
@@ -49,17 +50,24 @@ try {
         $params['tid'] = $technicianId;
     }
 
+    if ($pgId) {
+        $where[] = 't.assigned_pg_id = :pgid';
+        $params['pgid'] = $pgId;
+    }
+
     $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
     $sql = "SELECT 
-                t.id, t.patient_id, t.technician_id, t.assigned_doctor_id,
+                t.id, t.patient_id, t.technician_id, t.assigned_doctor_id, t.assigned_pg_id,
                 t.priority, t.technician_notes, t.assigned_at, t.created_at,
                 tech.name as technician_name, tech.email as technician_email,
                 doc.name as doctor_name, doc.email as doctor_email,
+                pg.name as pg_name, pg.email as pg_email,
                 p.name as patient_name, p.patient_id as patient_id_str, p.age as patient_age
             FROM tasks t
             LEFT JOIN users tech ON tech.id = t.technician_id
             LEFT JOIN users doc ON doc.id = t.assigned_doctor_id
+            LEFT JOIN users pg ON pg.id = t.assigned_pg_id
             LEFT JOIN patients p ON p.id = t.patient_id
             $whereClause
             ORDER BY t.created_at DESC
@@ -77,20 +85,21 @@ try {
             echo json_encode(['success'=>true, 'tasks' => [], 'count' => 0]); exit;
         }
 
-        // Now fetch all tasks belonging to those patients
         $ph = [];
         $binds = [];
         foreach ($pRows as $i => $pid) { $k = 'pp'.$i; $ph[] = ':'.$k; $binds[$k] = (int)$pid; }
         $in = implode(',', $ph);
         $sql = "SELECT 
-                    t.id, t.patient_id, t.technician_id, t.assigned_doctor_id,
+                    t.id, t.patient_id, t.technician_id, t.assigned_doctor_id, t.assigned_pg_id,
                     t.priority, t.technician_notes, t.assigned_at, t.created_at,
                     tech.name as technician_name, tech.email as technician_email,
                     doc.name as doctor_name, doc.email as doctor_email,
+                    pg.name as pg_name, pg.email as pg_email,
                     p.name as patient_name, p.patient_id as patient_id_str, p.age as patient_age
                 FROM tasks t
                 LEFT JOIN users tech ON tech.id = t.technician_id
                 LEFT JOIN users doc ON doc.id = t.assigned_doctor_id
+                LEFT JOIN users pg ON pg.id = t.assigned_pg_id
                 LEFT JOIN patients p ON p.id = t.patient_id
                 WHERE t.patient_id IN ($in)
                 ORDER BY t.created_at DESC";

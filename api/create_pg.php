@@ -20,7 +20,7 @@ try {
     $name = trim($data['name'] ?? '');
     $email = trim($data['email'] ?? '');
     $password = $data['password'] ?? '';
-    $createdBy = isset($data['created_by']) ? (int)$data['created_by'] : 0; // doctor id creating this PG
+    $createdBy = isset($data['created_by']) ? (int)$data['created_by'] : (isset($data['doctor_id']) ? (int)$data['doctor_id'] : 0); // doctor id creating this PG
 
     if ($createdBy <= 0 || $name === '' || $email === '' || $password === '') { http_response_code(400); echo json_encode(['success'=>false,'error'=>'Missing required fields']); exit; }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { http_response_code(400); echo json_encode(['success'=>false,'error'=>'Invalid email']); exit; }
@@ -40,8 +40,13 @@ try {
     $hash = password_hash($password, PASSWORD_DEFAULT);
     $ins = $pdo->prepare('INSERT INTO users (name, email, password_hash, role, created_at) VALUES (:name,:email,:hash,:role,NOW())');
     $ins->execute(['name'=>$name,'email'=>$email,'hash'=>$hash,'role'=>'pg']);
+    
+    $pgId = (int)$pdo->lastInsertId();
+    
+    $linkPg = $pdo->prepare('INSERT INTO doctor_pg (d_id, pg_id, created_at) VALUES (:did, :pgid, NOW())');
+    $linkPg->execute(['did' => $createdBy, 'pgid' => $pgId]);
 
-    echo json_encode(['success'=>true,'user_id' => (int)$pdo->lastInsertId()]);
+    echo json_encode(['success'=>true,'user_id' => $pgId]);
 
 } catch (Throwable $e) {
     error_log('create_pg error: '.$e->getMessage());

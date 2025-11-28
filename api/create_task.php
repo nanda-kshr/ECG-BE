@@ -136,6 +136,16 @@ try {
         $pdo->prepare('INSERT INTO task_history (task_id, changed_by, old_status, new_status, comment) VALUES (:tid,:uid,:old,:new,:comment)')->execute(['tid'=>$taskId,'uid'=>$technicianId,'old'=>null,'new'=>'assigned','comment'=>'Auto-assigned duty doctor']);
     }
 
+    // auto assign to current duty pg
+    $dutyPgStmt = $pdo->prepare("SELECT id FROM users WHERE role = 'pg' AND is_duty = 1 LIMIT 1");
+    $dutyPgStmt->execute();
+    $dutyPg = $dutyPgStmt->fetch(PDO::FETCH_ASSOC);
+    if ($dutyPg && isset($dutyPg['id'])) {
+        $pgId = (int)$dutyPg['id'];
+        $pdo->prepare('UPDATE tasks SET assigned_pg_id = :pgid, assigned_at = NOW() WHERE id = :tid')->execute(['pgid'=>$pgId,'tid'=>$taskId]);
+        $pdo->prepare('INSERT INTO task_history (task_id, changed_by, old_status, new_status, comment) VALUES (:tid,:uid,:old,:new,:comment)')->execute(['tid'=>$taskId,'uid'=>$technicianId,'old'=>null,'new'=>'assigned','comment'=>'Auto-assigned duty PG']);
+    }
+
     $pdo->commit();
     echo json_encode(['success'=>true,'task_id'=>$taskId,'images_uploaded'=>$imagesUploaded]);
 
