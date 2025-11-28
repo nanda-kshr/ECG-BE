@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "ECG App API (Full)",
+    "_postman_id": "ecg-app-api-collection-full",
+    "description": "Postman collection covering all required ECG app APIs (technicians, doctors, duty management, patients, tasks).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost/ecg_new/api", "type": "string" },
+    { "key": "adminId", "value": "1", "type": "string" },
+    { "key": "doctorId", "value": "2", "type": "string" },
+    { "key": "technicianId", "value": "3", "type": "string" },
+    { "key": "patientDbId", "value": "1", "type": "string" },
+    { "key": "taskId", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}" },
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "Login Doctor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"dr@example.com\",\n  \"password\": \"docpass\"\n}" },
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "Login Technician",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"tech@example.com\",\n  \"password\": \"techpass\"\n}" },
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "Register (Doctor/Technician)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Tech\",\n  \"email\": \"newtech@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"technician\"\n}" },
+            "url": "{{baseUrl}}/register.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Technicians",
+      "item": [
+        { "name": "List Technicians", "request": { "method": "GET", "url": "{{baseUrl}}/technicians.php?search=&limit=50&offset=0" } },
+        { "name": "Get Technician", "request": { "method": "GET", "url": "{{baseUrl}}/technicians.php?id={{technicianId}}" } },
+        {
+          "name": "Create Technician",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"name\": \"Tech One\",\n  \"email\": \"tech1@example.com\",\n  \"password\": \"techpass\"\n}" },
+            "url": "{{baseUrl}}/technicians.php"
+          }
+        },
+        {
+          "name": "Update Technician",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"id\": {{technicianId}},\n  \"name\": \"Tech One Updated\"\n}" },
+            "url": "{{baseUrl}}/technicians.php"
+          }
+        },
+        {
+          "name": "Delete Technician",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"id\": {{technicianId}}\n}" },
+            "url": "{{baseUrl}}/technicians.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctors",
+      "item": [
+        { "name": "List Doctors", "request": { "method": "GET", "url": "{{baseUrl}}/doctors.php?limit=50&offset=0" } },
+        { "name": "List Duty Doctors", "request": { "method": "GET", "url": "{{baseUrl}}/doctors.php?duty=1" } },
+        {
+          "name": "Create Doctor",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"name\": \"Dr. Example\",\n  \"email\": \"dr@example.com\",\n  \"password\": \"docpass\"\n}" }, "url": "{{baseUrl}}/doctors.php" }
+        },
+        {
+          "name": "Update Doctor",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"id\": {{doctorId}},\n  \"name\": \"Dr. Updated\"\n}" }, "url": "{{baseUrl}}/doctors.php" }
+        },
+        {
+          "name": "Set Duty Doctor",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"id\": {{doctorId}},\n  \"set_duty\": 1\n}" }, "url": "{{baseUrl}}/doctors.php" }
+        },
+        {
+          "name": "Remove Duty Doctor",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}}\n}" }, "url": "{{baseUrl}}/remove_duty_doctor.php" }
+        },
+        { "name": "Get Duty Doctors (Alt)", "request": { "method": "GET", "url": "{{baseUrl}}/get_duty_doctors.php" } },
+        { "name": "List Doctors (Legacy)", "request": { "method": "GET", "url": "{{baseUrl}}/list_doctors.php" } }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Create Patient",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Doe\",\n  \"age\": 45,\n  \"gender\": \"male\"\n}" }, "url": "{{baseUrl}}/patients.php" }
+        },
+        { "name": "Search Patients (prefix)", "request": { "method": "GET", "url": "{{baseUrl}}/patients.php?q=Jo&limit=20&offset=0" } }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task (JSON)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"technician_id\": {{technicianId}},\n  \"patient_id\": {{patientDbId}},\n  \"priority\": \"normal\",\n  \"technician_notes\": \"Routine ECG\",\n  \"comment\": \"Initial upload\"\n}" }, "url": "{{baseUrl}}/create_task.php" }
+        },
+        {
+          "name": "Create Task (multipart with image)",
+          "request": { "method": "POST", "body": { "mode": "formdata", "formdata": [ { "key": "technician_id", "value": "{{technicianId}}", "type": "text" }, { "key": "patient_id", "value": "{{patientDbId}}", "type": "text" }, { "key": "priority", "value": "normal", "type": "text" }, { "key": "technician_notes", "value": "Routine ECG", "type": "text" }, { "key": "comment", "value": "Initial upload", "type": "text" }, { "key": "image", "type": "file", "src": ["./uploads/ecg_images/PAT20251105001_1762333021_0.jpeg"] } ] }, "url": "{{baseUrl}}/create_task.php" }
+        },
+        {
+          "name": "Upload ECG (patient + images)",
+          "request": { "method": "POST", "body": { "mode": "formdata", "formdata": [ { "key": "technician_id", "value": "{{technicianId}}", "type": "text" }, { "key": "patient_name", "value": "Jane Smith", "type": "text" }, { "key": "patient_age", "value": "52", "type": "text" }, { "key": "patient_gender", "value": "female", "type": "text" }, { "key": "notes", "value": "Chest pain", "type": "text" }, { "key": "priority", "value": "high", "type": "text" }, { "key": "images", "type": "file", "src": ["./uploads/ecg_images/PAT20251105001_1762333021_0.jpeg", "./uploads/ecg_images/PAT20251105001_1762334644_0.jpeg"] } ] }, "url": "{{baseUrl}}/upload_ecg.php" }
+        },
+        { "name": "Duty Doctor - My Tasks", "request": { "method": "GET", "url": "{{baseUrl}}/duty_tasks.php" } },
+        { "name": "List Tasks (filters)", "request": { "method": "GET", "url": "{{baseUrl}}/list_tasks.php?doctor_id={{doctorId}}&status=assigned&limit=50&offset=0" } },
+        {
+          "name": "Duty Doctor - Complete Task",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"doctor_id\": {{doctorId}},\n  \"task_id\": {{taskId}},\n  \"comment\": \"Report finalized.\"\n}" }, "url": "{{baseUrl}}/duty_update_task.php" }
+        },
+        {
+          "name": "Generic Task Update",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"task_id\": {{taskId}},\n  \"user_id\": {{doctorId}},\n  \"status\": \"in_progress\",\n  \"feedback\": \"Working on it\"\n}" }, "url": "{{baseUrl}}/update_task.php" }
+        }
+      ]
+    },
+    {
+      "name": "Duty Management (Legacy)",
+      "item": [
+        {
+          "name": "Set Duty Doctor (Legacy)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"admin_id\": {{adminId}},\n  \"doctor_id\": {{doctorId}}\n}" }, "url": "{{baseUrl}}/set_duty_doctor.php" }
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "item": [
+        { "name": "DB Health", "request": { "method": "GET", "url": "{{baseUrl}}/test_db.php" } }
+      ]
+    }
+  ]
+}

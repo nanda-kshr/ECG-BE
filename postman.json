@@ -1,0 +1,181 @@
+{
+  "info": {
+    "name": "ECG App API",
+    "_postman_id": "ecg-app-api-collection",
+    "description": "Collection for all endpoints in api/ folder",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/ecg_new/api/",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "register",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"user@example.com\",\n  \"password\": \"password\",\n  \"role\": \"technician\"\n}"
+        },
+        "url": "{{baseUrl}}register.php"
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+        },
+        "url": "{{baseUrl}}login.php"
+      },
+      "response": []
+    },
+    {
+      "name": "create_admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpass\"\n}"
+        },
+        "url": "{{baseUrl}}create_admin.php"
+      },
+      "response": []
+    },
+    {
+      "name": "add_doctor",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Dr. Example\",\n  \"email\": \"dr@example.com\",\n  \"password\": \"docpass\",\n  \"specialty\": \"Cardiology\"\n}"
+        },
+        "url": "{{baseUrl}}add_doctor.php"
+      },
+      "response": []
+    },
+    {
+      "name": "set_duty_doctor",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"doctor_id\": 2,\n  \"date\": \"2025-11-12\"\n}"
+        },
+        "url": "{{baseUrl}}set_duty_doctor.php"
+      },
+      "response": []
+    },
+    {
+      "name": "get_duty_doctors",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}get_duty_doctors.php?date=2025-11-12"
+      },
+      "response": []
+    },
+    {
+      "name": "list_doctors",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}list_doctors.php"
+      },
+      "response": []
+    },
+    {
+      "name": "list_tasks",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}list_tasks.php"
+      },
+      "response": []
+    },
+    {
+      "name": "assign_task",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task_id\": 12,\n  \"assigned_doctor_id\": 3,\n  \"assigned_by\": 1\n}"
+        },
+        "url": "{{baseUrl}}assign_task.php"
+      },
+      "response": []
+    },
+    {
+      "name": "admin_assign_patient",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patient_id\": 123,\n  \"doctor_id\": 3,\n  \"assigned_by\": 1,\n  \"priority\": \"high\",\n  \"notes\": \"Urgent review requested\"\n}"
+        },
+        "url": "{{baseUrl}}admin_assign_patient.php"
+      },
+      "response": []
+    },
+    {
+      "name": "admin_dashboard",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}admin_dashboard.php"
+      },
+      "response": []
+    },
+    {
+      "name": "update_task",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task_id\": 12,\n  \"status\": \"completed\",\n  \"notes\": \"Reviewed and completed\"\n}"
+        },
+        "url": "{{baseUrl}}update_task.php"
+      },
+      "response": []
+    },
+    {
+      "name": "upload_ecg",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "patient_id", "value": "123", "type": "text" },
+            { "key": "technician_id", "value": "5", "type": "text" },
+            { "key": "ecg", "type": "file", "src": "./uploads/ecg_images/PAT20251105001_1762333021_0.jpeg" }
+          ]
+        },
+        "url": "{{baseUrl}}upload_ecg.php"
+      },
+      "response": []
+    },
+    {
+      "name": "test_db",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}test_db.php"
+      },
+      "response": []
+    }
+  ]
+}
