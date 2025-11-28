@@ -44,7 +44,7 @@ try {
     $pgId = (int)$pdo->lastInsertId();
     
     $linkPg = $pdo->prepare('INSERT INTO doctor_pg (d_id, pg_id, created_at) VALUES (:did, :pgid, NOW())');
-    $linkPg->execute(['did' => $createdBy, 'pgid' => $pgId]);
+    $linkPg->execute(['d_id' => $createdBy, 'pg_id' => $pgId]);
 
     echo json_encode(['success'=>true,'user_id' => $pgId]);
 

@@ -65,7 +65,11 @@ try {
         if ($exists->fetch()) { http_response_code(409); echo json_encode(['success'=>false,'error'=>'Email already exists']); exit; }
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $pdo->prepare("INSERT INTO users (name, email, password_hash, role, created_at) VALUES (:name,:email,:hash,'pg', NOW())")->execute(['name'=>$name,'email'=>$email,'hash'=>$hash]);
-        echo json_encode(['success'=>true,'pg_id'=>(int)$pdo->lastInsertId()]);
+        
+        $pgId = (int)$pdo->lastInsertId();
+        $pdo->prepare("INSERT INTO doctor_pg (d_id, pg_id, created_at) VALUES (:did, :pgid, NOW())")->execute(['did'=>$doctorId, 'pgid'=>$pgId]);
+        
+        echo json_encode(['success'=>true,'pg_id'=>$pgId]);
         exit;
     }
 
